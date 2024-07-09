@@ -176,6 +176,10 @@ func modrinthGetVersion(slug string, loaders string, version string) VersionResu
 }
 
 func modInstall(args []string) {
+    if len(args) < 3 {
+		log.Fatalln("Expected arguments.\n" + os.Args[0] + " mod install <id> <version> <loader>")
+	}
+
 	log.Println("Installing modrinth mod for " + args[0])
 
     versionInfo := modrinthGetVersion(args[0], args[1], args[2])

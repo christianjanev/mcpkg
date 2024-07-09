@@ -176,7 +176,7 @@ func paperSearch(args []string) {
 
 func paperInstall(args []string) {
 	if len(args) < 3 {
-		log.Fatalln("Expected arguments.\n" + os.Args[0] + " mod install <project> <version> <build>")
+		log.Fatalln("Expected arguments.\n" + os.Args[0] + " server install <project> <version> <build>")
 	}
 
 	downloadBuild(args[0], args[1], args[2], args[0]+"-"+args[1]+"-"+args[2]+".jar")
