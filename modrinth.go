@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"log"
+	"os"
 )
 
 const MODRINTH_ENDPOINT string = "https://api.modrinth.com/v2" 
@@ -176,6 +177,18 @@ func modrinthGetVersion(slug string, loaders string, version string) VersionResu
 
 func modInstall(args []string) {
 	log.Println("Installing modrinth mod for " + args[0])
+
+    versionInfo := modrinthGetVersion(args[0], args[1], args[2])
+    resp, _ := get(versionInfo.Files[0].Url)
+
+    out, err := os.Create(versionInfo.Files[0].Filename)
+
+    if err != nil {
+        log.Println(err.Error())
+        log.Fatalln("modInstall() File create failed.")
+    }
+
+    io.Copy(out, resp.Body)
 }
 
 func modSearch(args []string) {
