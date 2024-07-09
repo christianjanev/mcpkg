@@ -88,6 +88,41 @@ type GetResult struct {
     } `json:"gallery"`
 }
 
+type VersionResult struct {
+    Name string
+    Version_number string
+    Changelog string
+    Dependencies []struct {
+        Version_id string
+        Project_id string
+        File_name string
+        Dependency_type string
+    }
+    Game_versions []string
+    Version_type string
+    Loaders []string
+    Featured bool
+    Status string
+    Requested_status string
+    Id string
+    Project_id string
+    Author_id string
+    Date_published string
+    Downloads json.Number
+    Changelog_url string
+    Files []struct {
+        Hashes struct {
+            Sha512 string
+            Sha1 string
+        }
+        Url string
+        Filename string
+        Primary bool
+        Size json.Number
+        File_type string
+    }
+}
+
 func modrinthSearch(query string) SearchResults {
 	resp, _ := get(MODRINTH_ENDPOINT + "/search?query=" + query)
 	
@@ -116,10 +151,27 @@ func modrinthGet(slug string) GetResult {
 
     if err != nil {
         log.Println(err.Error())
-		log.Fatalln("modrinthSearch() json unmarshal failed.")
+		log.Fatalln("modrinthGet() json unmarshal failed.")
     }
 
     return body
+}
+
+func modrinthGetVersion(slug string, loaders string, version string) VersionResult {
+    resp, _ := get(MODRINTH_ENDPOINT + "/project/" + slug + "/version?loaders=" + loaders + "?game_versions=" + version)
+
+    bodyObj, _ := io.ReadAll(resp.Body)
+    bodyStr := string(bodyObj)
+    body := []VersionResult{}
+
+    err := json.Unmarshal([]byte(bodyStr), &body)
+
+    if err != nil {
+        log.Println(err.Error())
+		log.Fatalln("modrinthGetVersion() json unmarshal failed.")
+    }
+
+    return body[0]
 }
 
 func modInstall(args []string) {
@@ -132,7 +184,7 @@ func modSearch(args []string) {
     result := modrinthSearch(args[0])
 
     for index := 0; index < len(result.Hits); index++ {
-        log.Println(result.Hits[index].Title + " - " + result.Hits[index].Slug)
+        log.Println(result.Hits[index].Title + " - " + (result.Hits[index].Versions[0] + "-" + result.Hits[index].Versions[len(result.Hits[index].Versions)-1]) + " - " + result.Hits[index].Slug)
     }
 
 }
